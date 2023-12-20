@@ -11,7 +11,6 @@ export const authConfig = {
       const noneLoggedInPages =
         request.nextUrl.pathname === "/" ||
         request.nextUrl.pathname.startsWith("/reset") ||
-        request.nextUrl.pathname.endsWith("/reset") ||
         request.nextUrl.pathname === "/signup";
 
       if (isLoggedIn) {
