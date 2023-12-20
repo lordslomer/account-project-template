@@ -1,25 +1,24 @@
 "use client";
 import { emailSchema, passSchema, userSchema } from "../lib/validation-schemas";
-import { createUser } from "../lib/actions";
 import { useFormState } from "react-dom";
 import { useState } from "react";
-import Link from 'next/link';
+import Link from "next/link";
 import { z } from "zod";
 import { Input } from "../UI/input";
-import { Button, c } from "../UI/button";
+import { createUser } from "../lib/authenticate";
 
 type Errors = {
   username?: string[] | undefined;
   email?: string[] | undefined;
   pass?: string[] | undefined;
-}
+};
 
 export default function SignUpPage() {
   const SingUpForm = () => {
     //Input
-    const [username, setUsername] = useState('');
-    const [email, setEmail] = useState('');
-    const [pass, setPass] = useState('');
+    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
+    const [pass, setPass] = useState("");
 
     //Form
     const [error_code, dispatch] = useFormState(createUser, undefined);
@@ -32,18 +31,20 @@ export default function SignUpPage() {
           pass: passSchema,
         })
         .safeParse({ username, email, pass });
-      if (parsedFields.success) {
-        dispatch({ username, email, pass });
-      } else {
-        const newErrors = parsedFields.error.flatten().fieldErrors;
-        setErrors(newErrors)
-      }
+      if (parsedFields.success) dispatch({ username, email, pass });
+      else setErrors(parsedFields.error.flatten().fieldErrors);
     };
     return (
-      <form autoComplete="off" action={handleSubmit} noValidate className="flex justify-around items-center md:h-screen">
-        <div className="relative mx-auto w-full max-w-[500px] bg-1 flex flex-col rounded-md shadow-xl text-lg text-center py-12 md:px-20 px-10 space-y-8">
-
-          <h1 className="text-4xl">Signup</h1>
+      <form
+        autoComplete="off"
+        action={handleSubmit}
+        noValidate
+        className="mx-auto flex h-screen flex-col lg:container md:justify-center md:overflow-hidden 2xl:max-w-screen-xl"
+      >
+        <div className="relative mx-auto flex w-full max-w-[500px] flex-col space-y-8 px-4 text-center md:py-12 md:text-lg">
+          <h1 className="py-8 text-center text-2xl sm:p-8 md:text-4xl">
+            Signup
+          </h1>
 
           <div className="space-y-8">
             <Input
@@ -57,10 +58,10 @@ export default function SignUpPage() {
               type="text"
               required
               onChange={(e) => {
-                const inputText = e.target.value.trim()
+                const inputText = e.target.value.trim();
                 if (errors.username && userSchema.safeParse(inputText).success)
-                  errors.username = undefined
-                setUsername(inputText)
+                  errors.username = undefined;
+                setUsername(inputText);
               }}
             />
 
@@ -70,15 +71,15 @@ export default function SignUpPage() {
               value={email}
               label="Email"
               name="email"
-              type='email'
+              type="email"
               id="email"
               required
               errors={errors.email}
               onChange={(e) => {
-                const inputText = e.target.value.trim()
+                const inputText = e.target.value.trim();
                 if (errors.email && emailSchema.safeParse(inputText).success)
-                  errors.email = undefined
-                setEmail(inputText)
+                  errors.email = undefined;
+                setEmail(inputText);
               }}
             />
 
@@ -86,41 +87,42 @@ export default function SignUpPage() {
               autoComplete="off"
               label="Password"
               placeholder="* * * * * * * *"
-              type='password'
+              type="password"
               id="password"
               value={pass}
               name="pass"
               required
               errors={errors.pass}
               onChange={(e) => {
-                const inputText = e.target.value.trim()
+                const inputText = e.target.value.trim();
                 if (errors.pass) {
-                  const parsedInput = passSchema.safeParse(inputText)
-                  if (parsedInput.success)
-                    errors.pass = undefined
-                  else
-                    errors.pass = parsedInput.error?.flatten().formErrors
+                  const parsedInput = passSchema.safeParse(inputText);
+                  if (parsedInput.success) errors.pass = undefined;
+                  else errors.pass = parsedInput.error?.flatten().formErrors;
                 }
-                setPass(inputText)
+                setPass(inputText);
               }}
             />
           </div>
 
           <div className="flex flex-col space-y-2">
             {error_code && <p className="text-red-500">{error_code}</p>}
-            <Button variant={c.BLUE} type='submit'>SIGN UP</Button>
+            <button className="btn" type="submit">
+              SIGN UP
+            </button>
           </div>
-
-          <div className="flex flex-col">
+          <div className="flex space-x-4">
             <p>Already have an account?</p>
-            <Link className="text-blue-500" href='/login'>Log In</Link>
+            <Link
+              className="text-primary-500 hover:text-primary-400"
+              href="/"
+            >
+              Log In
+            </Link>
           </div>
-          <Link href='/' className="text-left text-blue-500">Back</Link>
         </div>
-      </form >
-    )
-  }
-  return (
-    <SingUpForm />
-  );
+      </form>
+    );
+  };
+  return <SingUpForm />;
 }

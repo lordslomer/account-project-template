@@ -1,20 +1,20 @@
-import { auth } from "@/auth";
 import SideNav from "../UI/sidenav";
+import VerifyPage from "../UI/verify";
+import { getUserByID } from "../lib/action";
 
 export default async function Layout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth();
+  const user = await getUserByID({ id: true, isVerified: true });
+  const verified = !!user?.isVerified;
   return (
-    <div className="flex h-screen flex-col md:flex-row md:overflow-hidden">
-      <div className="w-full flex-none md:w-64 max-md:fixed max-md:bottom-0 max-md:left-0">
-        <SideNav verified={!!(session?.user as any).isVerified} />
-      </div>
-      <main className="flex-grow md:overflow-y-auto p-4 md:p-8 lg:p-12">
-        {children}
+    <div className="mx-auto flex h-screen flex-col lg:container md:flex-row md:overflow-hidden 2xl:max-w-screen-xl">
+      <SideNav verified={verified} />
+      <main className="flex grow flex-col px-4 md:py-12">
+        {verified ? children : <VerifyPage user_id={user?.id} />}
       </main>
-    </div >
+    </div>
   );
 }

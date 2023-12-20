@@ -1,27 +1,28 @@
-import { Open_Sans } from 'next/font/google';
-import type { Metadata } from 'next';
-import './globals.css'
+import { Open_Sans } from "next/font/google";
+import type { Metadata } from "next";
+import "./globals.css";
 
-// TODO Edit MetaDeta
 export const metadata: Metadata = {
-  title: 'Wise Spend',
-  description: 'Spend Your Money Wisely',
-}
+  title: "Account Template",
+  description: "Account based project template",
+  metadataBase: new URL("https://dev.salamski.com"),
+  manifest: new URL("https://dev.salamski.com/manifest.json"),
+};
 const open = Open_Sans({
-  subsets: ['latin'],
-  weight: ['700'],
+  subsets: ["latin"],
+  weight: ["500"],
 });
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en">
-      <body className={`${open.className} antialiased bg-0`}>
+      <body className={`${open.className} bg-dark-100 text-white antialiased`}>
         {children}
       </body>
     </html>
-  )
+  );
 }

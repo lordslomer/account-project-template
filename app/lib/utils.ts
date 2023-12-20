@@ -11,44 +11,62 @@ const globalForOtpAsciiChars = globalThis as unknown as {
 const otpAsciiChars =
   globalForOtpAsciiChars.otpAsciiChars ?? otpAsciiCharsSingleton();
 export default otpAsciiChars;
-if (process.env.NODE_ENV !== 'production')
+if (process.env.NODE_ENV !== "production")
   globalForOtpAsciiChars.otpAsciiChars = otpAsciiChars;
 
 export const verificationEmailHTML = (username: string, otp: string) => `
 <div style='
       background-color: #121212;
       font-family: "Open Sans", sans-serif;
-      font-size: x-large;
+      font-size: large;
       overflow: hidden;
       color: white;
-      min-height: 50vh;
       '>
 
-  <div style='
-      background-image: linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05));
-      background-color: #121212;
-      border-radius: 4px;
+    <div style='
       text-align: center;
-      overflow: hidden;
-      width: 400px;
       margin: 100px auto;
       padding: 0 25px;
       '>
+      <h1 style='color: white;'>Hello ${username}</h1>
+      <h5 style='color: white;'>Welcome To Account Template.</h5>
+      <h5 style='color: white;'>Here is your verification code:</h5>
 
-    <h1 style='color: white;'>Hello ${username}</h1>
-
-    <h5 style='color: white;'>Here is your verification code:</h5>
-
-    <div style='
-      background-color: #121212;
+      <div style='
+      border-radius: 2px;
+      background-color: #292929;
       width: fit-content;
       letter-spacing: 20px;
-      padding: 0px 20px;
-      margin: auto;
+      padding: 5px 20px;
+      margin: 10px auto;
       '>
-      <h1 style='color: white;'>${otp}</h1>
+        <h1 style='margin: 0 auto; color: white;'>${otp}</h1>
+      </div>
     </div>
+  </div>`;
 
-    <h5 style='color: white;'>Welcome To WiseSpend.</h5>
-  </div>
+export const resetEmailHTML = (username: string, url: string) => `
+<div style='
+      background-color: #121212;
+      font-family: "Open Sans", sans-serif;
+      font-size: large;
+      overflow: hidden;
+      color: white;
+      '>
+  <div style='
+      text-align: center;
+      margin: 100px auto;
+      padding: 0 25px;
+      '>
+    <h1 style='color: white;'>Hello ${username}</h1>
+    <h5 style='color: white;'>Forgot your password?</h5>
+    <h5 style='color: white;'>Here is your password reset link:</h5>
+    
+    <a href='${url}'>Reset here</a>
+    
+    <h5 style='color: white;'>Or copy it:</h5>
+    
+    <a href='${url}'>${url}</a>
+    
+    </div>
 </div>`;

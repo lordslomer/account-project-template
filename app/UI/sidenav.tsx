@@ -1,68 +1,61 @@
-"use client"
-import { ArrowLeftOnRectangleIcon, HomeIcon, PhotoIcon, UserIcon } from "@heroicons/react/24/outline";
-import { logout } from "../lib/actions";
-import { Button, c } from "./button";
-import Link from 'next/link';
-import clsx from "clsx";
+"use client";
+import {
+  ArrowLeftOnRectangleIcon,
+  ArrowRightOnRectangleIcon,
+  ChevronLeftIcon,
+  HomeIcon,
+  UserIcon,
+} from "@heroicons/react/24/outline";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { logout } from "../lib/authenticate";
 
 const links = [
-  { name: 'Main', href: '/main', icon: HomeIcon },
-  { name: 'Account', href: '/main/account', icon: UserIcon }
-]
+  { name: "Main", href: ["/", "/main"], icon: HomeIcon },
+  { name: "Account", href: ["/main/account"], icon: UserIcon },
+];
 
 export default function SideNav({ verified }: { verified: boolean }) {
   const path = usePathname();
-  const userNotVerifiedStyle = { 'cursor-not-allowed': !verified }
   return (
-    <div className="flex h-full flex-col px-3 py-4 md:px-2">
-
+    <header className="flex w-full flex-none flex-col p-4 md:h-full md:w-64 md:py-12">
       {/* Logo */}
-      <Link className={clsx(`
-      h-20 md:h-40 mb-4
-      md:flex hidden items-center justify-center 
-      bg-1 rounded-md shadow-md 
-      transition-colors hover:bg-bg-2
-      `, userNotVerifiedStyle
-      )}
-        href="/main">
-        <div className="w-32 text-white md:w-40">
-          <div className={'flex flex-row items-center leading-none text-white space-x-4'}>
-            <PhotoIcon className="h-12 w-12" />
-            <p className="text-[44px]">App</p>
-          </div>
-        </div>
-      </Link>
+      <div className="hidden border-b py-8 sm:p-8 md:flex md:justify-center ">
+        <p className="text-center text-2xl md:text-4xl">App</p>
+      </div>
 
-
-      <div className="
-      flex flex-row md:flex-col justify-between 
-      grow space-x-2  md:space-x-0 md:space-y-2">
-
+      <div className=" mt-2 flex grow flex-row space-x-2 rounded md:flex-col  md:space-x-0 md:space-y-2">
         {links.map((link) => (
-          <Link key={link.name} href={link.href} className={clsx(`
-          flex md:flex-none items-center md:justify-start justify-center
-          grow h-[48px] gap-2 p-3 md:p-2 md:px-3
-          bg-1 rounded-md hover:bg-bg-2
-          transition-colors 
-          `, { 'bg-4': path === link.href, }, userNotVerifiedStyle
-          )}>
-            <link.icon className="w-6" />
+          <Link
+            key={link.name}
+            href={link.href[0]}
+            onClick={(e) => {
+              if (!verified) e.preventDefault();
+            }}
+            className={`hover:bg-dark-200 flex h-[48px] grow items-center justify-center gap-2  p-3 transition-colors md:flex-none md:justify-start md:px-3 md:py-2 ${
+              !verified ? "cursor-not-allowed" : null
+            }`}
+          >
+            <link.icon
+              className={`h-6 w-6 ${
+                link.href.includes(path) ? "max-md:border-b" : null
+              }`}
+            />
             <p className="hidden md:block">{link.name}</p>
+            {link.href.includes(path) ? (
+              <ChevronLeftIcon className="ml-auto hidden h-6 w-6 md:block" />
+            ) : null}
           </Link>
         ))}
 
-        <div className="hidden md:block grow h-auto w-full rounded-md bg-1"></div>
-
-        <form action={logout} className="flex justify-center">
-          <Button variant={c.RED} className="
-          md:flex-none max-md:h-auto
-          ">
-            <ArrowLeftOnRectangleIcon className="h8 w-8" />
-            <p className="hidden md:block">logout</p>
-          </Button>
+        <form action={logout}>
+          <button className="text-primary-600 hover:text-primary-400 hover:bg-dark-200 flex h-[48px] w-full items-center justify-center gap-2 p-3 transition-colors md:flex-none md:justify-start md:px-3 md:py-2">
+            <ArrowLeftOnRectangleIcon className="hidden h-6 w-6 md:block" />
+            <p className="hidden md:block">Log out</p>
+            <ArrowRightOnRectangleIcon className="block h-6 w-6 md:hidden" />
+          </button>
         </form>
       </div>
-    </div>
-  )
+    </header>
+  );
 }

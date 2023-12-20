@@ -1,35 +1,48 @@
-'use server';
-import otpAsciiChars, { verificationEmailHTML } from './utils';
-import prisma from './prisma';
-import bcrypt from 'bcrypt';
-const nodemailer = require('nodemailer');
+"use server";
+const nodemailer = require("nodemailer");
+import otpAsciiChars, { resetEmailHTML, verificationEmailHTML } from "./utils";
+import prisma from "./prisma";
+import bcrypt from "bcrypt";
+import { emailSchema } from "./validation-schemas";
+import { randomUUID } from "crypto";
 
 const generateOTP = () => {
   const possibleAsciiChars = otpAsciiChars;
   const randomizedAsciiChars = [...Array(5).keys()].map(
     () =>
-      possibleAsciiChars[Math.floor(Math.random() * possibleAsciiChars.length)]
+      possibleAsciiChars[Math.floor(Math.random() * possibleAsciiChars.length)],
   );
   return String.fromCharCode(...randomizedAsciiChars);
 };
+
+const transporter = nodemailer.createTransport({
+  host: process.env.SMPT_HOST,
+  port: 465,
+  secure: true,
+  auth: {
+    user: process.env.SMPT_LOGIN,
+    pass: process.env.SMPT_KEY,
+  },
+});
 
 export async function sendVerificationMail(user_id: string) {
   const where = {
     id: user_id,
   };
 
-  //Make sure the time intervales between requests is 1 min.
+  //Make sure the time intervales between requests are at least 1min long.
   const userById = await prisma.user.findUnique({
     where: where,
     select: {
+      isVerified: true,
       verifyDate: true,
       email: true,
       username: true,
     },
   });
-  if (!userById)
+  if (!userById || userById.isVerified)
     return {
-      msg: 'Failed to send email!',
+      msg: "Failed to send email!",
       success: false,
     };
 
@@ -37,10 +50,10 @@ export async function sendVerificationMail(user_id: string) {
   const currTime = new Date().getTime();
   if (verifyDate && currTime - verifyDate.getTime() < 60000) {
     const timeToWait = Math.ceil(
-      (60000 - currTime + verifyDate.getTime()) / 1000
+      (60000 - currTime + verifyDate.getTime()) / 1000,
     );
     return {
-      msg: 'Wait before sending again...',
+      msg: "Wait before sending again...",
       timeToWait: timeToWait,
       success: false,
     };
@@ -57,34 +70,66 @@ export async function sendVerificationMail(user_id: string) {
       },
     });
 
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMPT_HOST,
-      port: 465,
-      secure: true,
-      auth: {
-        user: process.env.SMPT_LOGIN,
-        pass: process.env.SMPT_KEY,
-      },
+    transporter.sendMail({
+      from: `"Account Template" <${process.env.SMPT_LOGIN}>`,
+      to: userById.email,
+      subject: `Account Template | ${otp}`,
+      text: `Hello ${userById.username}
+      \nWelcome To Account Template.
+      \nHere is your verification code:
+      \n${otp}
+      `,
+      html: verificationEmailHTML(userById.username, otp),
     });
-
-    console.log(otp)
-    // await transporter.sendMail({
-    //   from: '"WiseSpend" <wisespend@salamski.pro>',
-    //   to: userById.email,
-    //   subject: 'WiseSpend | Verification Code',
-    //   text: `Hello ${userById.username}
-    //   \nHere is your verification code:
-    //   \n${otp}
-    //   \nWelcome To WiseSpend.`,
-    //   html: verificationEmailHTML(userById.username, otp),
-    // });
 
     return { success: true };
   } catch (error) {
     console.log(error);
     return {
-      msg: 'Failed to send email!',
+      msg: "Failed to send email!",
       success: false,
     };
   }
+}
+
+export async function sendResetMail(input: string) {
+  const parsedFields = emailSchema.safeParse(input);
+  if (!parsedFields.success) return;
+
+  const email = parsedFields.data;
+
+  const user = await prisma.user.findUnique({
+    where: { email },
+    select: { resetDate: true, resetToken: true, username: true },
+  });
+
+  //send once per min.
+  if (
+    !user ||
+    (user.resetDate && new Date().getTime() - user.resetDate.getTime() < 60000)
+  )
+    return;
+
+  const token = randomUUID()
+    .replaceAll("-", "")
+    .concat(randomUUID().replaceAll("-", ""));
+
+  await prisma.user.update({
+    where: { email },
+    data: { resetToken: token, resetDate: new Date() },
+  });
+
+  transporter.sendMail({
+    from: `"Account Template" <${process.env.SMPT_LOGIN}>`,
+    to: email,
+    subject: `Account Template | Reset link`,
+    text: `Hello ${user.username}
+      \nWelcome To Account Template.
+      \nHere is your password reset link:
+      \n${process.env.HOST}/${token}/reset
+      `,
+    html: resetEmailHTML(user.username, `${process.env.HOST}/${token}/reset`),
+  });
+
+  return;
 }
