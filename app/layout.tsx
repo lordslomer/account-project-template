@@ -5,8 +5,8 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Account Template",
   description: "Account based project template",
-  metadataBase: new URL("https://dev.salamski.com"),
-  manifest: new URL("https://dev.salamski.com/manifest.json"),
+  metadataBase: new URL(process.env.HOST || ""),
+  manifest: new URL(`${process.env.HOST || ""}/manifest.json`),
 };
 const open = Open_Sans({
   subsets: ["latin"],

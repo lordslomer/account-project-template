@@ -126,9 +126,9 @@ export async function sendResetMail(input: string) {
     text: `Hello ${user.username}
       \nWelcome To Account Template.
       \nHere is your password reset link:
-      \n${process.env.HOST}/${token}/reset
+      \n${process.env.HOST}/reset/${token}
       `,
-    html: resetEmailHTML(user.username, `${process.env.HOST}/${token}/reset`),
+    html: resetEmailHTML(user.username, `${process.env.HOST}/reset/${token}`),
   });
 
   return;
