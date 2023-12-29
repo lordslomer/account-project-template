@@ -1,6 +1,6 @@
 {
   "name": "App Template",
-  "short_name": "Account based project template",
+  "short_name": "apptemp",
   "orientation": "any",
   "scope": "/",
   "start_url": "/",
