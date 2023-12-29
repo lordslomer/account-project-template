@@ -58,8 +58,8 @@ export default function ReqestResetPage() {
                   setEmail_errors([]);
                 setEmail(inputText);
               }}
-              />
-              
+            />
+
             <div className="flex justify-center">
               <button className="btn space-x-2" type="submit">
                 <p className="hidden md:block ">Send reset link</p>

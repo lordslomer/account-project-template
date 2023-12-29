@@ -15,7 +15,7 @@ const links = [
   { name: "Account", href: ["/main/account"], icon: UserIcon },
 ];
 
-export default function SideNav({ verified }: { verified: boolean }) {
+export default function SideNav() {
   const path = usePathname();
   return (
     <header className="flex w-full flex-none flex-col p-4 md:h-full md:w-64 md:py-12">
@@ -29,12 +29,8 @@ export default function SideNav({ verified }: { verified: boolean }) {
           <Link
             key={link.name}
             href={link.href[0]}
-            onClick={(e) => {
-              if (!verified) e.preventDefault();
-            }}
-            className={`hover:bg-dark-200 flex h-[48px] grow items-center justify-center gap-2  p-3 transition-colors md:flex-none md:justify-start md:px-3 md:py-2 ${
-              !verified ? "cursor-not-allowed" : null
-            }`}
+
+            className={`flex h-[48px] grow items-center justify-center gap-2 p-3  transition-colors hover:bg-dark-200 md:flex-none md:justify-start md:px-3 md:py-2 `}
           >
             <link.icon
               className={`h-6 w-6 ${
@@ -49,7 +45,7 @@ export default function SideNav({ verified }: { verified: boolean }) {
         ))}
 
         <form action={logout}>
-          <button className="text-primary-600 hover:text-primary-400 hover:bg-dark-200 flex h-[48px] w-full items-center justify-center gap-2 p-3 transition-colors md:flex-none md:justify-start md:px-3 md:py-2">
+          <button className="flex h-[48px] w-full items-center justify-center gap-2 p-3 text-primary-600 transition-colors hover:bg-dark-200 hover:text-primary-400 md:flex-none md:justify-start md:px-3 md:py-2">
             <ArrowLeftOnRectangleIcon className="hidden h-6 w-6 md:block" />
             <p className="hidden md:block">Log out</p>
             <ArrowRightOnRectangleIcon className="block h-6 w-6 md:hidden" />
