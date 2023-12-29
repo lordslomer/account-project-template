@@ -55,7 +55,7 @@ export async function changeUsername(prevState: State, input: string) {
     },
   });
 
-  revalidatePath("/main/account");
+  revalidatePath("/account");
   return { success: true, msg: "Username changed!" };
 }
 
@@ -79,8 +79,7 @@ export async function changeEmail(prevState: State, input: string) {
 
   await sendVerificationMail(session.user.id);
 
-  revalidatePath("/main/account");
-  return { success: true };
+  redirect("/");
 }
 
 export async function changePass(prevState: State, formData: FormData) {
