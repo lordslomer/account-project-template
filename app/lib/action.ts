@@ -8,6 +8,7 @@ import { sendVerificationMail } from "./mailer";
 import { logout } from "./authenticate";
 import { z } from "zod";
 import bcrypt from "bcrypt";
+import { redirect } from "next/navigation";
 
 export type State = {
   success: boolean;
