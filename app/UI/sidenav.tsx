@@ -12,7 +12,7 @@ import { logout } from "../lib/authenticate";
 
 const links = [
   { name: "Main", href: ["/", "/main"], icon: HomeIcon },
-  { name: "Account", href: ["/main/account"], icon: UserIcon },
+  { name: "Account", href: ["/account"], icon: UserIcon },
 ];
 
 export default function SideNav() {
